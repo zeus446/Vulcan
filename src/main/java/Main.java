@@ -1,25 +1,14 @@
-package main.java;
+import view.MainFrame;
 
-import java.sql.Connection;
-
-import main.java.database.databaseManager;
+import javax.swing.SwingUtilities;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        try {
+        SwingUtilities.invokeLater(() -> {
+            new MainFrame();
+        });
 
-            Connection connection = databaseManager.getConnection();
-
-            System.out.println("Database connected successfully!");
-
-            connection.close();
-
-        } catch (Exception e) {
-
-            System.out.println("Database connection failed!");
-            e.printStackTrace();
-        }
     }
 }
