@@ -1,141 +1,57 @@
 # CSV Analyzer
 
-A Java-based CSV analysis application built using **Java Swing** for the graphical user interface and **JDBC + MySQL** for database connectivity.
+CSV Analyzer is a Java Swing desktop application for importing and exploring CSV datasets. Analysis runs locally; MySQL is optional and is only used for the legacy saved-dataset list.
 
-The application is designed to allow users to import CSV files, view dataset information, analyze data, and store dataset information in a MySQL database.
+## Features
 
----
+- Reads UTF-8 CSV files with comma, semicolon, tab, or pipe delimiters.
+- Supports quoted delimiters, escaped quotes, and quoted fields spanning multiple lines.
+- Handles UTF-8 byte-order marks, duplicate/blank column names, and rows with missing trailing cells.
+- Reports row/column counts, missing values, duplicate rows, distinct values, and per-column profiles.
+- Detects numeric columns and calculates mean, median, standard deviation, minimum, and maximum.
+- Calculates Pearson correlations for numeric column pairs, plots selectable numeric histograms (optionally grouped by a category), and creates pie charts by category using row counts or the sum of a selected numeric column.
+- Previews up to 1,000 rows while retaining the complete dataset in memory for analysis.
 
-## 📌 Project Status
+Missing values are blank cells or the case-insensitive markers `NA`, `N/A`, `null`, and `none`. Numeric correlations describe linear association and do not imply causation.
 
-### ✅ Completed
+## Requirements
 
-* Java Swing GUI
-* CSV file selection using `JFileChooser`
-* Dashboard-style interface
-* Sidebar navigation
-* Dataset statistics cards
-* `JTable` dataset preview
-* MySQL database setup
-* JDBC connection
-* JDBC `INSERT` functionality
-* JDBC `SELECT` functionality
-* Display database records through the Swing interface
+- Java 8 or later
+- MySQL Connector/J is only needed to use the optional saved-dataset screen.
 
-### 🚧 Planned
+## Build and run
 
-* Full CSV parsing
-* Automatic row/column counting
-* Missing-value analysis
-* Duplicate detection
-* Bar charts
-* Pie charts
-* Histograms
-* Complete database table display
-* Improved error handling
-* Final UI polishing
+From the project root on Windows:
 
----
-
-## 🛠️ Technologies Used
-
-| Technology            | Purpose                    |
-| --------------------- | -------------------------- |
-| **Java**              | Main programming language  |
-| **Java Swing**        | Graphical User Interface   |
-| **JDBC**              | Java-to-MySQL connectivity |
-| **MySQL**             | Database                   |
-| **MySQL Connector/J** | JDBC driver                |
-| **JTable**            | Dataset display            |
-| **JFileChooser**      | CSV file selection         |
-
----
-
-## 📂 Project Structure
-
-```text
-csv_analyser/
-│
-├── lib/
-│   └── mysql-connector-j-26.7.0.jar
-│
-├── src/
-│   └── main/
-│       └── java/
-│           │
-│           ├── Main.java
-│           │
-│           ├── view/
-│           │   └── MainFrame.java
-│           │
-│           └── database/
-│               └── DatabaseManager.java
-│
-├── out/
-│
-└── README.md
-```
-
----
-
-## ▶️ How to Run
-
-### 1. Clone or download the project
-
-Open the project directory in your terminal:
-
-```bash
-cd csv_analyser
-```
-
-### 2. Make sure MySQL is configured
-
-Ensure that the required MySQL database has already been created and that the credentials in `DatabaseManager.java` are correctly configured.
-
-### 3. Compile the project
-
-Run:
-
-```bash
-javac -cp "lib\mysql-connector-j-26.7.0.jar" -d out src\main\java\database\DatabaseManager.java src\main\java\view\MainFrame.java src\main\java\Main.java
-```
-
-### 4. Run the application
-
-```bash
+```powershell
+New-Item -ItemType Directory -Force out
+javac -encoding UTF-8 -cp "lib\mysql-connector-j-26.7.0.jar" -d out src\main\java\analysis\CsvDataset.java src\main\java\analysis\DistributionChart.java src\main\java\database\databaseManager.java src\main\java\view\MainFrame.java src\main\java\Main.java
 java -cp "out;lib\mysql-connector-j-26.7.0.jar" Main
 ```
 
----
+The database driver can be omitted from the classpath when using only local CSV analysis:
 
-## 🗄️ Database
-
-The application uses **MySQL** through **JDBC** to store and retrieve dataset information.
-
-The database must be configured before running the application.
-
-The JDBC connection is managed through:
-
-```text
-database/
-└── DatabaseManager.java
+```powershell
+javac -encoding UTF-8 -d out src\main\java\analysis\CsvDataset.java src\main\java\analysis\DistributionChart.java src\main\java\database\databaseManager.java src\main\java\view\MainFrame.java src\main\java\Main.java
+java -cp out Main
 ```
 
----
+## Optional MySQL configuration
 
-## 📊 Planned Analysis Features
+The default connection URL is `jdbc:mysql://localhost:3306/csv_analyser` and the default username is `root`. Configure credentials through environment variables rather than source code:
 
-The final version of CSV Analyzer is intended to provide automated dataset analysis, including:
+```powershell
+$env:CSV_ANALYZER_DB_URL = "jdbc:mysql://localhost:3306/csv_analyser"
+$env:CSV_ANALYZER_DB_USER = "root"
+$env:CSV_ANALYZER_DB_PASSWORD = "your-local-password"
+```
 
-* Row and column statistics
-* Missing-value detection
-* Duplicate-row detection
-* Numerical data analysis
-* Categorical data analysis
-* Dataset visualizations
-* Bar charts
-* Pie charts
-* Histograms
+The optional database screen expects a `datasets` table with `dataset_id`, `filename`, `row_count`, and `column_count` columns. CSV import and analysis do not require a database.
 
----
+## Run the analysis checks
 
+```powershell
+New-Item -ItemType Directory -Force out
+javac -encoding UTF-8 -d out src\main\java\analysis\CsvDataset.java src\test\java\analysis\CsvDatasetTest.java
+java -cp out analysis.CsvDatasetTest
+```

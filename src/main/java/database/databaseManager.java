@@ -8,15 +8,20 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class DatabaseManager {
+public class databaseManager {
 
     private static final String URL =
-            "jdbc:mysql://localhost:3306/csv_analyser";
-
-    private static final String USER = "root";
-
+            getEnvironmentValue("CSV_ANALYZER_DB_URL",
+                    "jdbc:mysql://localhost:3306/csv_analyser");
+    private static final String USER =
+            getEnvironmentValue("CSV_ANALYZER_DB_USER", "root");
     private static final String PASSWORD =
-            "test";
+            getEnvironmentValue("CSV_ANALYZER_DB_PASSWORD", "");
+
+    private static String getEnvironmentValue(String name, String defaultValue) {
+        String value = System.getenv(name);
+        return value == null ? defaultValue : value;
+    }
 
     public static Connection getConnection()
             throws SQLException {
